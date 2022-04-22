@@ -2,13 +2,99 @@
 <html>
   <head>
     <meta charset="utf-8">
-    <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
+    <script src="https://aframe.io/releases/1.1.0/aframe.min.js"></script>
   </head>
   <body>
-    <a-scene id="scene">
-      <a-box position="0 -.5 0" width="80" height="1" depth="100" color="green"></a-box>
-      <a-box position="-4 1 -5" width="4" height="4" depth="4" color="white" src="https://fkpc.github.io/kanirobovr/assets/kanirobo/kanirobo.outline_mini.png"></a-box>
-      <a-sphere position="0 0.795 -3" radius="0.795" color="lime"></a-sphere>
+    <a-scene main id="scene">
+      <a-sky id="sky" position="0 -400 0" src="https://tomomine.github.io/aframe-examples/RemoteMediaFile_6553661_0_2021_04_06_16_13_06.JPG"
+        x-animation="property:position; to:0 580 0; dur:14000; easing:easeInOutQuad; loop:false"
+        x-animation__2="property:position;from: 0 580 0; to:0 200 0; dur:10000; easing:easeInOutQuad; loop:false; delay:14000;"
+        x-animation__3="property:position;from: 0 200 0; to:0 500 0; dur:8800; easing:easeInOutQuad; loop:false; delay:24000;"
+      ></a-sky>
+      <a-entity id="me" rotation="0 0 0">
+        <a-entity id="handleft" oculus-touch-controls="hand: left"></a-entity>
+        <a-entity id="handright" oculus-touch-controls="hand: right"></a-entity>
+      </a-entity>
+      <a-entity id="camera" camera look-controls>
+        <a-text id="txt" value="3" position="0 0 -1" scale="2 2 2" align="center" color="#fff"></a-text>
+      </a-entity>
     </a-scene>
   </body>
+<script type="module">
+import { CSV } from "https://js.sabae.cc/CSV.js";
+import { rnd } from "https://js.sabae.cc/rnd.js";
+
+let ot = new Date().getTime();
+const M = 50; // kg 体重
+const G = 9.8; // m/s2 重力加速度
+const DT = 1 / 60; // sec 計算間隔
+const DTM = 1000 / 60; // msec 計算間隔
+const K1 = 10; // n/m ばね定数
+const K2 = 0.24; // kg/m 空気抵抗係数
+const L = 350; // m バンジーロープ長さ
+const D = 0.98; // 速度減衰率
+let y = 0;
+let v = 0;
+
+let state = 0;
+
+const reset = () => {
+  y = v = 0;
+  state = 0;
+  ot = new Date().getTime();
+  console.log("reset")
+};
+
+let data = null;
+
+const bg = async () => {
+  const d = data[rnd(data.length)];
+  const url2 = "https://code4fukui.github.io/vr-fukui/img/" + d.filename;
+  sky.setAttribute("src", url2);
+};
+
+document.body.onclick = () => reset();
+//document.body.onclick = () => bg();
+
+const url = "https://code4fukui.github.io/vr-fukui/vr-fukui.csv";
+data = CSV.toJSON(await CSV.fetch(url));
+
+handright.addEventListener('triggerdown', reset);
+handright.addEventListener('gripdown', reset);
+handleft.addEventListener('triggerdown', reset);
+handleft.addEventListener('gripdown', reset);
+handright.addEventListener("bbuttondown", bg);
+
+ /*
+AFRAME.registerComponent("main", {
+	init: async function() {
+  },
+  tick: function() {
+  }
+});
+*/
+
+setInterval(async () => {
+  if (state == 0) {
+    const t = (new Date().getTime() - ot) / 1000;
+    txt.setAttribute("value", Math.floor(4 - t))
+    if (t > 3) {
+      txt.setAttribute("value", "");
+      state = 1;
+      ot = new Date().getTime();
+    }
+  } else if (state == 1) {
+    const t = (new Date().getTime() - ot) / 1000;
+    const f = M * G - (y > L ? K1 * (y - L) : 0) - K2 * v * v;
+    const a = f / M;
+    v += a * DT;
+    v *= D;
+    y += v;
+  }
+  sky.setAttribute("position", { x: 0, y: y, z: 0 });
+  //box.style.top = y * 3;
+  //p.textContent = `t:${t} y:${y}`;
+}, DTM);
+
+</script>
 </html>
