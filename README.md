@@ -1,5 +1,7 @@
 # Bungee Jumping VR
 
+> 日本語のREADMEはこちらです: [README.ja.md](README.ja.md)
+
 A VR bungee jumping simulation.
 
 ## Demo
