@@ -23,4 +23,4 @@ This project requires an Oculus VR headset and controllers to run.
 4. Press the A or B button to change the sky background.
 
 ## License
-This project is licensed under the MIT License.
+MIT License — see [LICENSE](LICENSE).
