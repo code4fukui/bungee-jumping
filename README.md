@@ -6,7 +6,7 @@ An immersive WebXR bungee jumping simulation built with A-Frame, featuring physi
 
 ## Demo
 
-Experience it live in your VR browser: **https://code4fukui.github.io/bungee-jumping/**
+Experience it live in your VR browser: **https://github.com/code4fukui/bungee-jumping
 
 ## Features
 
